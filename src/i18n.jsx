@@ -151,6 +151,7 @@ const dict = {
     cookie: { text: 'We use cookies to improve your experience. By accepting, you agree to the use of analytics and functional cookies.', policy: 'Cookie Policy', reject: 'Reject', accept: 'Accept all' },
     notFound: { title: 'Page not found', text: 'The page you are looking for does not exist.', back: 'Back to home' },
     whatsapp: 'Chat on WhatsApp',
+    preview: { text: 'Design draft — the new EasyFix website. Orders and logins are not active yet; only a selection of products is shown.' },
   },
   el: {
     tagline: 'Κινητά & αξεσουάρ',
@@ -296,6 +297,7 @@ const dict = {
     cookie: { text: 'Χρησιμοποιούμε cookies για να βελτιώσουμε την εμπειρία σας. Αποδεχόμενοι, συμφωνείτε με τη χρήση cookies ανάλυσης και λειτουργικότητας.', policy: 'Πολιτική Cookies', reject: 'Απόρριψη', accept: 'Αποδοχή όλων' },
     notFound: { title: 'Η σελίδα δεν βρέθηκε', text: 'Η σελίδα που ψάχνετε δεν υπάρχει.', back: 'Επιστροφή στην αρχική' },
     whatsapp: 'Συνομιλία στο WhatsApp',
+    preview: { text: 'Προσχέδιο σχεδίασης — η νέα ιστοσελίδα της EasyFix. Οι παραγγελίες και οι συνδέσεις δεν είναι ακόμη ενεργές· εμφανίζεται μόνο μια επιλογή προϊόντων.' },
   },
   ru: {
     tagline: 'Телефоны и аксессуары',
@@ -441,6 +443,7 @@ const dict = {
     cookie: { text: 'Мы используем cookies, чтобы улучшить ваш опыт. Принимая, вы соглашаетесь на использование аналитических и функциональных cookies.', policy: 'Политика Cookies', reject: 'Отклонить', accept: 'Принять все' },
     notFound: { title: 'Страница не найдена', text: 'Страница, которую вы ищете, не существует.', back: 'На главную' },
     whatsapp: 'Написать в WhatsApp',
+    preview: { text: 'Черновик дизайна — новый сайт EasyFix. Заказы и вход пока не работают; показана только часть товаров.' },
   },
 }
 

@@ -6,6 +6,42 @@ import { contact } from '../data/site.js'
 import Icon, { WhatsAppGlyph } from './Icon.jsx'
 
 const CONSENT_KEY = 'easyfix-cookie-consent'
+const PREVIEW_KEY = 'easyfix-preview-banner'
+
+export const IS_PREVIEW = import.meta.env.VITE_PREVIEW !== 'false'
+
+export function PreviewBanner() {
+  const { t } = useLang()
+  const [hidden, setHidden] = useState(() => {
+    try {
+      return sessionStorage.getItem(PREVIEW_KEY) === 'hidden'
+    } catch {
+      return false
+    }
+  })
+  if (!IS_PREVIEW || hidden) return null
+  return (
+    <div className="relative bg-primary text-primary-fg" role="note">
+      <p className="container-x py-2 pr-12 text-center text-[13px] leading-snug font-semibold sm:text-sm">
+        <Icon name="bolt" size={15} className="mr-1.5 inline -translate-y-px" />
+        {t.preview.text}
+      </p>
+      <button
+        type="button"
+        onClick={() => {
+          setHidden(true)
+          try {
+            sessionStorage.setItem(PREVIEW_KEY, 'hidden')
+          } catch {}
+        }}
+        className="absolute top-1/2 right-2 grid size-9 -translate-y-1/2 place-items-center rounded-full hover:bg-black/10"
+        aria-label={t.close}
+      >
+        <Icon name="x" size={18} />
+      </button>
+    </div>
+  )
+}
 
 export function CookieBanner() {
   const { t } = useLang()

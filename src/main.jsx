@@ -7,7 +7,7 @@ import { CartProvider } from './lib/cart.jsx'
 import { ScrollReset, SmoothScroll } from './components/Motion.jsx'
 import Header from './components/Header.jsx'
 import Footer from './components/Footer.jsx'
-import { CartToast, CookieBanner, WhatsAppButton } from './components/Overlays.jsx'
+import { CartToast, CookieBanner, PreviewBanner, WhatsAppButton } from './components/Overlays.jsx'
 import Home from './pages/Home.jsx'
 import Shop from './pages/Shop.jsx'
 import Product from './pages/Product.jsx'
@@ -20,6 +20,7 @@ function Layout() {
   return (
     <>
       <ScrollReset />
+      <PreviewBanner />
       <Header />
       <main className="min-h-[60vh]">
         <Outlet />

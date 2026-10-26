@@ -15,6 +15,13 @@ npm run preview   # serve dist/
 The site is a single-page app. When hosting it, rewrite all paths to `index.html`
 (`public/_redirects` for Netlify and `vercel.json` for Vercel are included).
 
+### Draft mode
+
+By default the build is a **design draft**: an orange banner (EN/EL/RU) says orders and logins are not active
+yet, and `<meta name="robots" content="noindex, nofollow">` keeps search engines from indexing it. For the real
+launch, set the environment variable `VITE_PREVIEW=false` (e.g. in Vercel → Project → Settings → Environment
+Variables) and redeploy — banner and noindex disappear.
+
 ## Kept 1:1 from the current site
 
 - **Colours**: primary orange `#f68000`, brand black `#0b0b0b`, top bar `#030303`, accent `#ffeede`,
