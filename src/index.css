@@ -1,0 +1,104 @@
+@import 'tailwindcss';
+@import 'lenis/dist/lenis.css';
+
+/* EasyFix brand colours — taken 1:1 from the current easyfixcy.com theme */
+@theme {
+  --color-primary: #f68000;
+  --color-primary-600: #e07400;
+  --color-primary-fg: #0b0b0b;
+  --color-brand: #0b0b0b;
+  --color-brand-fg: #fcfcfc;
+  --color-topbar: #030303;
+  --color-topbar-fg: #e4e4e4;
+  --color-secondary: #f2f2f2;
+  --color-muted: #f2f2f2;
+  --color-muted-fg: #505050;
+  --color-accent: #ffeede;
+  --color-border: #e1e1e1;
+  --color-destructive: #e60018;
+  --color-success: #059669;
+
+  --font-sans: 'Inter', ui-sans-serif, system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+
+  --radius-card: 14px;
+  --shadow-card: 0 1px 2px rgb(11 11 11 / 0.04), 0 8px 24px -12px rgb(11 11 11 / 0.12);
+  --shadow-lift: 0 2px 4px rgb(11 11 11 / 0.05), 0 24px 48px -20px rgb(11 11 11 / 0.28);
+}
+
+@layer base {
+  html {
+    -webkit-text-size-adjust: 100%;
+  }
+  body {
+    @apply bg-white text-brand font-sans antialiased;
+    overflow-x: clip;
+  }
+  ::selection {
+    background: var(--color-primary);
+    color: var(--color-primary-fg);
+  }
+  :focus-visible {
+    outline: 2px solid var(--color-primary);
+    outline-offset: 2px;
+  }
+  h1,
+  h2,
+  h3 {
+    letter-spacing: -0.02em;
+    text-wrap: balance;
+  }
+}
+
+@utility container-x {
+  @apply mx-auto w-full max-w-7xl px-4 sm:px-6;
+}
+@utility btn {
+  @apply inline-flex items-center justify-center gap-2 rounded-lg px-5 py-2.5 text-sm font-semibold whitespace-nowrap transition-all duration-200 select-none disabled:cursor-not-allowed disabled:opacity-50;
+}
+@utility btn-primary {
+  @apply btn bg-primary text-primary-fg shadow-[0_8px_20px_-8px_rgb(246_128_0/0.7)] hover:-translate-y-px hover:bg-primary-600 active:translate-y-0;
+}
+@utility btn-dark {
+  @apply btn bg-brand text-brand-fg hover:-translate-y-px hover:bg-black;
+}
+@utility btn-outline {
+  @apply btn border border-border bg-white text-brand hover:border-brand;
+}
+@utility btn-ghost-light {
+  @apply btn border border-white/25 bg-white/5 text-white backdrop-blur hover:border-white/60 hover:bg-white/10;
+}
+@utility input {
+  @apply w-full rounded-lg border border-border bg-white px-3.5 py-2.5 text-sm outline-none transition placeholder:text-muted-fg/70 focus:border-primary focus:ring-4 focus:ring-primary/15;
+}
+@utility eyebrow {
+  @apply text-xs font-bold tracking-[0.2em] text-primary uppercase;
+}
+@utility no-scrollbar {
+  scrollbar-width: none;
+  &::-webkit-scrollbar {
+    display: none;
+  }
+}
+
+@layer components {
+  .prose-legal h2 {
+    @apply mt-8 mb-2 text-lg font-bold;
+  }
+  .prose-legal p,
+  .prose-legal li {
+    @apply text-[15px] leading-relaxed text-muted-fg;
+  }
+  .prose-legal ul {
+    @apply list-disc space-y-1 pl-5;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
