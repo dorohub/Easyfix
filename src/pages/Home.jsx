@@ -1,159 +1,155 @@
+import { useRef } from 'react'
 import { Link } from 'react-router'
+import { gsap } from 'gsap'
+import { useGSAP } from '@gsap/react'
 import { useLang } from '../i18n.jsx'
-import { categories, stores } from '../data/site.js'
+import { categories, contact, heroSlides, stores } from '../data/site.js'
 import { getProducts } from '../lib/catalog.js'
-import HeroSlider from '../components/HeroSlider.jsx'
 import ProductCard from '../components/ProductCard.jsx'
+import Rail, { SectionTitle } from '../components/Rail.jsx'
 import VantaNet from '../components/VantaNet.jsx'
-import Icon from '../components/Icon.jsx'
-import { Reveal } from '../components/Motion.jsx'
+import Icon, { WhatsAppGlyph } from '../components/Icon.jsx'
+import { Reveal, prefersReducedMotion } from '../components/Motion.jsx'
 
-function UspBar() {
+/* ——— Hero: big statement, product line-up that grows as you scroll ——— */
+function Hero() {
   const { t } = useLang()
-  const items = [
-    ['shield', t.usp.warranty, t.uspSub.warranty],
-    ['truck', t.usp.shipping, t.uspSub.shipping],
-    ['rotate', t.usp.returns, t.uspSub.returns],
-    ['wrench', t.usp.repairs, t.uspSub.repairs],
-  ]
+  const h = t.home
+  const root = useRef(null)
+
+  useGSAP(
+    () => {
+      if (prefersReducedMotion()) return
+      const intro = gsap.timeline({ defaults: { ease: 'expo.out' } })
+      intro
+        .from('[data-hero-line]', { yPercent: 110, duration: 1.3, stagger: 0.12 })
+        .from('[data-hero-fade]', { y: 16, autoAlpha: 0, duration: 1, stagger: 0.08 }, 0.45)
+        .from('[data-hero-img]', { y: 80, scale: 0.94, autoAlpha: 0, duration: 1.8 }, 0.2)
+
+      gsap.to('[data-hero-copy]', {
+        yPercent: -30,
+        autoAlpha: 0,
+        ease: 'none',
+        scrollTrigger: { trigger: root.current, start: 'top top', end: '55% top', scrub: true },
+      })
+      gsap.fromTo(
+        '[data-hero-img] img',
+        { scale: 1 },
+        { scale: 1.16, ease: 'none', scrollTrigger: { trigger: root.current, start: 'top top', end: 'bottom top', scrub: true } }
+      )
+    },
+    { scope: root }
+  )
+
   return (
-    <div className="border-b border-border bg-white">
-      <div className="container-x grid grid-cols-2 gap-y-5 py-6 lg:grid-cols-4">
-        {items.map(([icon, title, sub]) => (
-          <div key={title} className="flex items-center gap-3.5 lg:justify-center">
-            <span className="grid size-11 shrink-0 place-items-center rounded-xl bg-accent text-primary"><Icon name={icon} size={22} /></span>
-            <span>
-              <span className="block text-sm font-bold sm:text-[15px]">{title}</span>
-              <span className="block text-xs text-muted-fg sm:text-[13px]">{sub}</span>
-            </span>
-          </div>
-        ))}
+    <section ref={root} className="relative isolate overflow-hidden bg-brand text-white">
+      <div className="pointer-events-none absolute top-[38%] left-1/2 -z-10 size-[min(1100px,140vw)] -translate-x-1/2 rounded-full bg-[radial-gradient(circle,rgb(246_128_0/0.22),transparent_62%)]" />
+      <div data-hero-copy className="container-x relative z-10 pt-16 text-center sm:pt-24">
+        <p data-hero-fade className="eyebrow">{h.heroEyebrow}</p>
+        <h1 className="display-xl mt-4">
+          <span className="block overflow-hidden pb-[0.06em]"><span data-hero-line className="block">{h.heroTitle[0]}</span></span>
+          <span className="block overflow-hidden pb-[0.08em]">
+            <span data-hero-line className="block bg-gradient-to-r from-[#ffb15c] via-primary to-[#ff6a00] bg-clip-text text-transparent">{h.heroTitle[1]}</span>
+          </span>
+        </h1>
+        <p data-hero-fade className="lead mx-auto mt-6 max-w-xl text-white/70">{h.heroText}</p>
+        <div data-hero-fade className="mt-8 flex flex-wrap items-center justify-center gap-x-7 gap-y-4">
+          <Link to="/shop" className="btn-primary px-7 py-3.5 text-[16px]">{t.shopNow}</Link>
+          <Link to="/repairs" className="link-arrow text-[16px] text-primary">
+            {h.heroCta2}
+            <Icon name="chevronRight" size={16} />
+          </Link>
+        </div>
       </div>
-    </div>
+      <div data-hero-img className="relative mx-auto mt-6 w-full max-w-[1500px] sm:-mt-4">
+        <div className="overflow-hidden [mask-image:linear-gradient(to_bottom,transparent,#000_22%,#000_78%,transparent)]">
+          <img src="/hero/iphone.jpg" alt="iPhone line-up at EasyFix Limassol" className="mx-auto aspect-[16/9] w-full object-cover" fetchPriority="high" />
+        </div>
+      </div>
+    </section>
   )
 }
 
-function SectionHead({ title, to, linkLabel }) {
-  return (
-    <div className="mb-7 flex items-end justify-between gap-4" data-reveal>
-      <h2 className="text-2xl font-extrabold sm:text-[32px]">{title}</h2>
-      {to && (
-        <Link to={to} className="group flex shrink-0 items-center gap-1.5 text-sm font-semibold text-primary">
-          {linkLabel}
-          <Icon name="arrowRight" size={16} className="transition group-hover:translate-x-1" />
-        </Link>
-      )}
-    </div>
-  )
-}
-
-function ProductRow({ products }) {
-  return (
-    <div className="grid grid-cols-2 gap-3 sm:gap-5 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5">
-      {products.map((p) => (
-        <ProductCard key={p.id} product={p} />
-      ))}
-    </div>
-  )
-}
-
-function CategoryGrid() {
+/* ——— Store nav: category icons ——— */
+function StoreNav() {
   const { t, pick } = useLang()
   return (
-    <section className="container-x py-14 sm:py-20">
-      <SectionHead title={t.shopByCategory} to="/shop" linkLabel={t.viewAll} />
-      <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 sm:gap-4 lg:grid-cols-6">
-        {categories.map((c, i) => (
-          <Link
-            key={c.slug}
-            to={`/category/${c.slug}`}
-            data-reveal-item
-            className={`group relative flex flex-col justify-between overflow-hidden rounded-[var(--radius-card)] border border-border bg-white p-4 transition duration-300 hover:-translate-y-1 hover:border-primary hover:shadow-[var(--shadow-lift)] sm:p-5 ${
-              i < 2 ? 'lg:col-span-3 lg:min-h-44 lg:flex-row lg:items-end lg:bg-gradient-to-br lg:from-white lg:to-accent' : 'lg:col-span-1'
-            }`}
-          >
-            <span className={`grid place-items-center rounded-xl bg-accent text-primary transition duration-300 group-hover:bg-primary group-hover:text-primary-fg ${i < 2 ? 'size-12 lg:order-2 lg:size-20' : 'size-12'}`}>
-              <Icon name={c.icon} size={i < 2 ? 30 : 24} />
+    <section className="pt-16 sm:pt-24">
+      <div className="container-x">
+        <SectionTitle parts={t.home.storeTitle} />
+      </div>
+      <Rail label={t.categoriesLabel} className="mt-8">
+        {categories.map((c) => (
+          <Link key={c.slug} to={`/category/${c.slug}`} className="group flex w-[104px] shrink-0 snap-start flex-col items-center gap-3 text-center sm:w-[118px]" data-reveal-item>
+            <span className="grid size-[84px] place-items-center rounded-[26px] bg-muted text-brand transition duration-500 ease-(--ease-out-expo) group-hover:-translate-y-1 group-hover:bg-primary group-hover:text-primary-fg sm:size-[96px]">
+              <Icon name={c.icon} size={34} strokeWidth={1.5} />
             </span>
-            <span className={`mt-6 block ${i < 2 ? 'lg:mt-0' : ''}`}>
-              <span className={`block font-bold leading-tight ${i < 2 ? 'text-[15px] lg:text-2xl' : 'text-[15px]'}`}>{pick(c.name)}</span>
-            </span>
+            <span className="text-[13px] leading-tight font-semibold">{pick(c.name)}</span>
           </Link>
         ))}
-      </div>
+      </Rail>
     </section>
   )
 }
 
-function RepairBand() {
-  const { t } = useLang()
-  const services = [
-    ['screen', t.repairs.services[0][0]],
-    ['battery', t.repairs.services[1][0]],
-    ['port', t.repairs.services[2][0]],
-    ['water', t.repairs.services[3][0]],
-  ]
-  return (
-    <section className="container-x py-6">
-      <div className="relative overflow-hidden rounded-3xl bg-accent px-6 py-10 sm:px-12 sm:py-14" data-reveal>
-        <div className="absolute -right-24 -bottom-24 size-80 rounded-full bg-primary/15 blur-2xl" />
-        <div className="relative grid items-center gap-8 lg:grid-cols-[1.2fr_1fr]">
-          <div>
-            <p className="eyebrow">{t.repairs.eyebrow}</p>
-            <h2 className="mt-3 text-[28px] leading-tight font-extrabold sm:text-4xl">{t.repairBand.title}</h2>
-            <p className="mt-3 max-w-lg text-muted-fg">{t.repairBand.text}</p>
-            <div className="mt-7 flex flex-wrap gap-3">
-              <Link to="/repairs" className="btn-primary px-6 py-3">{t.repairBand.cta}<Icon name="arrowRight" size={18} /></Link>
-              <a href="tel:+35796633328" className="btn-outline px-6 py-3"><Icon name="call" size={17} />+357 96 633328</a>
-            </div>
-          </div>
-          <div className="grid grid-cols-2 gap-3">
-            {services.map(([icon, label]) => (
-              <div key={label} className="flex items-center gap-3 rounded-2xl bg-white p-4 shadow-[var(--shadow-card)]">
-                <span className="grid size-10 shrink-0 place-items-center rounded-xl bg-primary text-primary-fg"><Icon name={icon} size={20} /></span>
-                <span className="text-sm font-semibold leading-tight">{label}</span>
-              </div>
-            ))}
-          </div>
-        </div>
-      </div>
-    </section>
-  )
-}
-
-function WholesaleBand() {
-  const { t } = useLang()
-  return (
-    <section className="relative isolate overflow-hidden bg-brand text-white">
-      <VantaNet />
-      <div className="pointer-events-none absolute inset-0 bg-gradient-to-r from-brand via-brand/85 to-brand/30" />
-      <div className="container-x relative py-20 sm:py-24" data-reveal>
-        <p className="eyebrow">{t.wholesaleBand.eyebrow}</p>
-        <h2 className="mt-4 max-w-2xl text-[30px] leading-tight font-extrabold sm:text-5xl">{t.wholesaleBand.title}</h2>
-        <p className="mt-4 max-w-lg text-white/70">{t.wholesaleBand.text}</p>
-        <Link to="/wholesale" className="btn-primary mt-8 px-7 py-3.5">{t.wholesaleBand.cta}<Icon name="arrowRight" size={18} /></Link>
-      </div>
-    </section>
-  )
-}
-
-function WoltBand() {
+/* ——— Promo cards (the four slides of the current site) ——— */
+function PromoCard({ slide }) {
   const { t, pick } = useLang()
+  const repair = !slide.image
   return (
-    <section className="container-x py-14">
-      <div className="flex flex-col items-start justify-between gap-6 rounded-3xl border border-border p-6 sm:p-8 md:flex-row md:items-center" data-reveal>
-        <div className="flex items-center gap-4">
-          <img src="/brand/wolt.png" alt="Wolt" width="56" height="56" className="size-14 rounded-2xl" />
-          <div>
-            <h2 className="text-xl font-extrabold">{t.woltBand.title} Wolt</h2>
-            <p className="text-sm text-muted-fg">{t.woltBand.text}</p>
-          </div>
+    <Link
+      to={slide.to}
+      className="group relative flex h-[480px] w-[82vw] shrink-0 snap-start flex-col overflow-hidden rounded-[var(--radius-card)] bg-brand text-white shadow-[var(--shadow-card)] sm:h-[520px] sm:w-[400px]"
+      data-reveal-item
+    >
+      {slide.image ? (
+        <img src={slide.image} alt="" loading="lazy" className="absolute inset-0 size-full object-cover object-center transition duration-[1.2s] ease-(--ease-out-expo) group-hover:scale-[1.06]" />
+      ) : (
+        <div className="absolute inset-0">
+          <div className="absolute -right-24 -bottom-24 size-[420px] rounded-full bg-[radial-gradient(circle,rgb(246_128_0/0.45),transparent_62%)] transition duration-700 group-hover:scale-110" />
+          <Icon name="wrench" size={220} strokeWidth={0.8} className="absolute right-[-30px] bottom-6 text-primary/80 transition duration-700 ease-(--ease-out-expo) group-hover:-rotate-12" />
         </div>
-        <div className="flex w-full flex-col gap-2 sm:w-auto sm:flex-row">
-          {stores.map((s) => (
-            <a key={s.id} href={s.wolt} target="_blank" rel="noreferrer" className="btn border border-[#009de0] text-[#0077aa] hover:bg-[#009de0] hover:text-white">
-              Wolt — {pick(s.name)}
-            </a>
+      )}
+      <div className="absolute inset-0 bg-gradient-to-b from-black/80 via-black/20 to-transparent" />
+      <div className="relative p-7 sm:p-8">
+        <p className="text-[12px] font-semibold tracking-[0.12em] text-primary">{slide.eyebrow}</p>
+        <h3 className="mt-2 text-[28px] leading-[1.08] font-bold tracking-[-0.03em]">
+          {pick(slide.title)} <span className="text-primary">{pick(slide.accent)}</span>
+        </h3>
+        <p className="mt-2 text-[15px] text-white/75">{pick(slide.lead)}</p>
+      </div>
+      <span className="relative mt-auto mr-6 mb-6 ml-auto grid size-10 place-items-center rounded-full bg-white/15 backdrop-blur transition group-hover:bg-primary group-hover:text-primary-fg" aria-hidden="true">
+        <Icon name={repair ? 'wrench' : 'plus'} size={18} />
+      </span>
+    </Link>
+  )
+}
+
+/* ——— Bento: reasons to shop ——— */
+function Bento() {
+  const { t } = useLang()
+  const icons = ['shield', 'truck', 'rotate', 'wrench', 'store', 'bolt']
+  const span = ['col-span-2', '', '', '', '', 'col-span-2']
+  return (
+    <section className="bg-muted py-16 sm:py-24">
+      <div className="container-x">
+        <SectionTitle parts={t.home.whyTitle} />
+        <div className="mt-10 grid grid-cols-2 gap-3 sm:gap-5 md:grid-cols-4">
+          {t.home.bento.map(([big, title, text], i) => (
+            <div
+              key={title}
+              data-reveal-item
+              className={`relative flex min-h-[180px] flex-col justify-between gap-8 overflow-hidden rounded-[var(--radius-card)] p-5 sm:min-h-[240px] sm:gap-10 sm:p-8 ${span[i]} ${
+                i === 0 ? 'bg-brand text-white' : i === 5 ? 'bg-primary text-primary-fg' : 'bg-white'
+              }`}
+            >
+              <Icon name={icons[i]} size={26} className={i === 0 ? 'text-primary' : i === 5 ? 'text-primary-fg' : 'text-primary'} />
+              <div>
+                <p className={`font-bold tracking-[-0.045em] ${i === 0 || i === 5 ? 'text-[56px] leading-none sm:text-[88px]' : 'text-[30px] leading-none sm:text-[44px]'}`}>{big}</p>
+                <p className="mt-3 text-[15px] font-semibold sm:text-[17px]">{title}</p>
+                <p className={`mt-1 text-[13px] leading-snug sm:text-[15px] ${i === 0 ? 'text-white/65' : i === 5 ? 'text-primary-fg/75' : 'text-muted-fg'}`}>{text}</p>
+              </div>
+            </div>
           ))}
         </div>
       </div>
@@ -161,36 +157,173 @@ function WoltBand() {
   )
 }
 
+/* ——— Pinned statement: words light up while scrolling ——— */
+function Statement() {
+  const { t } = useLang()
+  const root = useRef(null)
+  const words = t.home.statement.split(' ')
+  useGSAP(
+    () => {
+      if (prefersReducedMotion()) return
+      gsap.fromTo(
+        '[data-word]',
+        { opacity: 0.14 },
+        {
+          opacity: 1,
+          stagger: 0.1,
+          ease: 'none',
+          scrollTrigger: { trigger: root.current, start: 'top top', end: '+=120%', scrub: 0.6, pin: true, anticipatePin: 1 },
+        }
+      )
+    },
+    { scope: root, dependencies: [t.home.statement], revertOnUpdate: true }
+  )
+  return (
+    <section ref={root} className="flex min-h-[100svh] items-center bg-white">
+      <p className="container-x display-lg max-w-5xl">
+        {words.map((w, i) => (
+          <span key={i} data-word className={/stores|καταστήματα|магазина|Limassol|Λεμεσό|Лимасоле/i.test(w) ? 'text-primary' : ''}>
+            {w}{' '}
+          </span>
+        ))}
+      </p>
+    </section>
+  )
+}
+
+/* ——— Repair ——— */
+function RepairSection() {
+  const { t } = useLang()
+  const icons = ['screen', 'battery', 'port', 'water']
+  return (
+    <section className="relative overflow-hidden bg-brand py-20 text-white sm:py-28">
+      <div className="pointer-events-none absolute -top-40 right-[-10%] size-[700px] rounded-full bg-[radial-gradient(circle,rgb(246_128_0/0.25),transparent_62%)]" />
+      <div className="container-x relative">
+        <SectionTitle parts={t.home.repairTitle} dark />
+        <p className="lead mt-5 max-w-2xl text-white/65" data-reveal>{t.repairs.lead}</p>
+        <div className="mt-12 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+          {t.repairs.services.map(([title, text], i) => (
+            <div key={title} className="rounded-[var(--radius-card)] bg-white/[0.06] p-7 ring-1 ring-white/10 transition duration-500 hover:bg-white/[0.1]" data-reveal-item>
+              <Icon name={icons[i]} size={30} strokeWidth={1.5} className="text-primary" />
+              <h3 className="mt-8 text-[19px] font-semibold tracking-tight">{title}</h3>
+              <p className="mt-2 text-[15px] leading-relaxed text-white/60">{text}</p>
+            </div>
+          ))}
+        </div>
+        <div className="mt-10 flex flex-wrap items-center gap-x-8 gap-y-4" data-reveal>
+          <Link to="/repairs" className="btn-primary px-7 py-3.5 text-[16px]">{t.repairBand.cta}</Link>
+          <a href={`${contact.whatsapp}?text=${encodeURIComponent('Hi EasyFix, I need a repair quote.')}`} target="_blank" rel="noreferrer" className="link-arrow text-[16px]">
+            <WhatsAppGlyph size={18} />
+            {t.repairs.cta}
+            <Icon name="chevronRight" size={16} />
+          </a>
+        </div>
+      </div>
+    </section>
+  )
+}
+
+/* ——— Wholesale card ——— */
+function WholesaleCard() {
+  const { t } = useLang()
+  return (
+    <section className="container-x py-16 sm:py-24">
+      <div className="relative isolate overflow-hidden rounded-[36px] bg-brand px-7 py-16 text-white sm:px-14 sm:py-24" data-reveal>
+        <VantaNet />
+        <div className="pointer-events-none absolute inset-0 bg-gradient-to-r from-brand via-brand/80 to-brand/10" />
+        <div className="relative max-w-xl">
+          <p className="eyebrow">{t.wholesaleBand.eyebrow}</p>
+          <h2 className="display-md mt-3">{t.wholesaleBand.title}</h2>
+          <p className="lead mt-4 text-white/65">{t.wholesaleBand.text}</p>
+          <Link to="/wholesale" className="btn-primary mt-8 px-7 py-3.5 text-[16px]">{t.wholesaleBand.cta}</Link>
+        </div>
+      </div>
+    </section>
+  )
+}
+
+/* ——— Visit us ——— */
+function Visit() {
+  const { t, pick } = useLang()
+  return (
+    <section className="bg-white py-16 sm:py-24">
+      <div className="container-x">
+        <SectionTitle parts={t.home.visitTitle} />
+        <div className="mt-10 grid gap-5 md:grid-cols-2">
+          {stores.map((s, i) => (
+            <div key={s.id} className="group relative overflow-hidden rounded-[var(--radius-card)] bg-muted p-7 sm:p-9" data-reveal-item>
+              <div className="pointer-events-none absolute -top-16 -right-16 size-56 rounded-full bg-white transition duration-700 group-hover:scale-125" />
+              <div className="relative">
+                <span className="grid size-12 place-items-center rounded-2xl bg-brand text-primary"><Icon name="pin" size={22} /></span>
+                <p className="mt-6 text-[13px] font-semibold text-primary">EasyFix 0{i + 1}</p>
+                <h3 className="headline mt-1">{pick(s.name)}</h3>
+                <p className="mt-1 text-muted-fg">{pick(s.address)}</p>
+                <div className="mt-7 flex flex-wrap gap-x-6 gap-y-3">
+                  <a href={s.map} target="_blank" rel="noreferrer" className="link-arrow">{t.home.openMaps}<Icon name="chevronRight" size={15} /></a>
+                  <a href={s.wolt} target="_blank" rel="noreferrer" className="link-arrow text-[#009de0]">Wolt<Icon name="chevronRight" size={15} /></a>
+                  <a href={contact.phoneHref} className="link-arrow text-brand">{contact.phone}</a>
+                </div>
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
+    </section>
+  )
+}
+
+function ProductSection({ title, products, to, bg = '' }) {
+  const { t } = useLang()
+  return (
+    <section className={`pt-16 sm:pt-24 ${bg}`}>
+      <div className="container-x flex flex-wrap items-end justify-between gap-4">
+        <SectionTitle parts={title} />
+        <Link to={to} className="link-arrow text-[15px]" data-reveal>{t.viewAll}<Icon name="chevronRight" size={15} /></Link>
+      </div>
+      <Rail label={title[0]} className="mt-8">
+        {products.map((p) => (
+          <ProductCard key={p.id} product={p} variant="rail" />
+        ))}
+      </Rail>
+    </section>
+  )
+}
+
 export default function Home() {
   const { t } = useLang()
-  const newest = getProducts({ condition: 'new', sort: 'priceDesc' }).filter((p) => p.category !== 'ipad-tablets').slice(0, 10)
+  const latest = getProducts({ condition: 'new', sort: 'priceDesc' }).filter((p) => p.category !== 'ipad-tablets').slice(0, 10)
   const used = getProducts({ condition: 'used', sort: 'priceDesc' }).slice(0, 10)
   const tablets = getProducts({ category: 'ipad-tablets', sort: 'priceDesc' }).slice(0, 10)
 
   return (
     <>
-      <h1 className="sr-only">EasyFix Cyprus — Mobile Shop &amp; Phone Repair in Limassol</h1>
-      <HeroSlider />
-      <UspBar />
+      <Hero />
       <Reveal>
-        <CategoryGrid />
-        <section className="container-x pb-16">
-          <SectionHead title={t.newProducts} to="/category/new-devices" linkLabel={t.seeMore} />
-          <ProductRow products={newest} />
+        <StoreNav />
+        <section className="pt-10 sm:pt-16">
+          <div className="container-x">
+            <SectionTitle parts={t.home.promosTitle} />
+          </div>
+          <Rail label={t.home.promosTitle[0]} className="mt-8">
+            {heroSlides.map((s) => (
+              <PromoCard key={s.id} slide={s} />
+            ))}
+          </Rail>
         </section>
-        <RepairBand />
-        <section className="container-x py-16">
-          <SectionHead title={t.usedProducts} to="/category/used-devices" linkLabel={t.seeMore} />
-          <ProductRow products={used} />
-        </section>
+        <ProductSection title={t.home.latestTitle} products={latest} to="/category/new-devices" />
       </Reveal>
-      <WholesaleBand />
+      <div className="h-16 sm:h-24" />
       <Reveal>
-        <section className="container-x py-16">
-          <SectionHead title={t.ipadTablets} to="/category/ipad-tablets" linkLabel={t.seeMore} />
-          <ProductRow products={tablets} />
-        </section>
-        <WoltBand />
+        <Bento />
+      </Reveal>
+      <Statement />
+      <Reveal>
+        <RepairSection />
+        <ProductSection title={t.home.usedTitle} products={used} to="/category/used-devices" />
+        <WholesaleCard />
+        <ProductSection title={t.home.tabletsTitle} products={tablets} to="/category/ipad-tablets" bg="-mt-16 sm:-mt-24" />
+        <div className="h-16 sm:h-24" />
+        <Visit />
       </Reveal>
     </>
   )

@@ -1,7 +1,8 @@
 @import 'tailwindcss';
 @import 'lenis/dist/lenis.css';
 
-/* EasyFix brand colours — taken 1:1 from the current easyfixcy.com theme */
+/* EasyFix brand colours — taken 1:1 from the current easyfixcy.com theme.
+   Orange is the only accent; everything else is black, white and the brand greys. */
 @theme {
   --color-primary: #f68000;
   --color-primary-600: #e07400;
@@ -20,17 +21,23 @@
 
   --font-sans: 'Inter', ui-sans-serif, system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
 
-  --radius-card: 14px;
-  --shadow-card: 0 1px 2px rgb(11 11 11 / 0.04), 0 8px 24px -12px rgb(11 11 11 / 0.12);
-  --shadow-lift: 0 2px 4px rgb(11 11 11 / 0.05), 0 24px 48px -20px rgb(11 11 11 / 0.28);
+  --radius-card: 28px;
+  --shadow-card: 0 2px 6px rgb(11 11 11 / 0.03), 0 12px 32px -12px rgb(11 11 11 / 0.12);
+  --shadow-lift: 0 4px 10px rgb(11 11 11 / 0.04), 0 30px 60px -24px rgb(11 11 11 / 0.3);
+
+  --ease-apple: cubic-bezier(0.25, 0.1, 0.25, 1);
+  --ease-out-expo: cubic-bezier(0.16, 1, 0.3, 1);
 }
 
 @layer base {
   html {
     -webkit-text-size-adjust: 100%;
+    text-rendering: optimizeLegibility;
   }
   body {
-    @apply bg-white text-brand font-sans antialiased;
+    @apply bg-white font-sans text-[17px] leading-[1.47] text-brand antialiased;
+    font-feature-settings: 'cv11', 'ss01', 'ss03';
+    letter-spacing: -0.011em;
     overflow-x: clip;
   }
   ::selection {
@@ -39,39 +46,90 @@
   }
   :focus-visible {
     outline: 2px solid var(--color-primary);
-    outline-offset: 2px;
+    outline-offset: 3px;
+    border-radius: 6px;
   }
   h1,
   h2,
   h3 {
-    letter-spacing: -0.02em;
     text-wrap: balance;
   }
 }
 
+/* ——— type scale (Apple-like: big, tight, semibold) ——— */
+@utility display-xl {
+  font-size: clamp(44px, 8.4vw, 104px);
+  line-height: 1.02;
+  font-weight: 700;
+  letter-spacing: -0.045em;
+}
+@utility display-lg {
+  font-size: clamp(36px, 5.6vw, 72px);
+  line-height: 1.04;
+  font-weight: 700;
+  letter-spacing: -0.04em;
+}
+@utility display-md {
+  font-size: clamp(28px, 3.8vw, 48px);
+  line-height: 1.08;
+  font-weight: 700;
+  letter-spacing: -0.035em;
+}
+@utility headline {
+  font-size: clamp(22px, 2.4vw, 28px);
+  line-height: 1.14;
+  font-weight: 650;
+  letter-spacing: -0.025em;
+}
+@utility lead {
+  font-size: clamp(18px, 1.7vw, 22px);
+  line-height: 1.4;
+  letter-spacing: -0.015em;
+}
+
+/* ——— layout & controls ——— */
 @utility container-x {
-  @apply mx-auto w-full max-w-7xl px-4 sm:px-6;
+  @apply mx-auto w-full max-w-[1200px] px-5 sm:px-8;
+}
+@utility container-wide {
+  @apply mx-auto w-full max-w-[1440px] px-5 sm:px-8;
 }
 @utility btn {
-  @apply inline-flex items-center justify-center gap-2 rounded-lg px-5 py-2.5 text-sm font-semibold whitespace-nowrap transition-all duration-200 select-none disabled:cursor-not-allowed disabled:opacity-50;
+  @apply inline-flex cursor-pointer items-center justify-center gap-2 rounded-full px-6 py-3 text-[15px] font-semibold whitespace-nowrap transition duration-300 ease-(--ease-apple) select-none disabled:cursor-not-allowed disabled:opacity-40;
 }
 @utility btn-primary {
-  @apply btn bg-primary text-primary-fg shadow-[0_8px_20px_-8px_rgb(246_128_0/0.7)] hover:-translate-y-px hover:bg-primary-600 active:translate-y-0;
+  @apply btn bg-primary text-primary-fg hover:bg-primary-600 active:scale-[0.98];
 }
 @utility btn-dark {
-  @apply btn bg-brand text-brand-fg hover:-translate-y-px hover:bg-black;
+  @apply btn bg-brand text-brand-fg hover:bg-black active:scale-[0.98];
+}
+@utility btn-light {
+  @apply btn bg-white text-brand hover:bg-muted active:scale-[0.98];
 }
 @utility btn-outline {
-  @apply btn border border-border bg-white text-brand hover:border-brand;
+  @apply btn border border-brand/15 bg-transparent text-brand hover:border-brand/40;
 }
 @utility btn-ghost-light {
   @apply btn border border-white/25 bg-white/5 text-white backdrop-blur hover:border-white/60 hover:bg-white/10;
 }
+@utility link-arrow {
+  @apply inline-flex cursor-pointer items-center gap-1 font-semibold text-primary transition hover:gap-2;
+}
 @utility input {
-  @apply w-full rounded-lg border border-border bg-white px-3.5 py-2.5 text-sm outline-none transition placeholder:text-muted-fg/70 focus:border-primary focus:ring-4 focus:ring-primary/15;
+  @apply w-full rounded-2xl border border-border bg-white px-4 py-3 text-[16px] outline-none transition placeholder:text-muted-fg/70 focus:border-primary focus:ring-4 focus:ring-primary/15;
 }
 @utility eyebrow {
-  @apply text-xs font-bold tracking-[0.2em] text-primary uppercase;
+  @apply text-[13px] font-semibold tracking-[0.02em] text-primary;
+}
+@utility glass {
+  background: rgb(250 250 250 / 0.72);
+  -webkit-backdrop-filter: saturate(180%) blur(20px);
+  backdrop-filter: saturate(180%) blur(20px);
+}
+@utility glass-dark {
+  background: rgb(11 11 11 / 0.72);
+  -webkit-backdrop-filter: saturate(180%) blur(20px);
+  backdrop-filter: saturate(180%) blur(20px);
 }
 @utility no-scrollbar {
   scrollbar-width: none;
@@ -82,14 +140,14 @@
 
 @layer components {
   .prose-legal h2 {
-    @apply mt-8 mb-2 text-lg font-bold;
+    @apply mt-10 mb-3 text-xl font-semibold tracking-tight;
   }
   .prose-legal p,
   .prose-legal li {
-    @apply text-[15px] leading-relaxed text-muted-fg;
+    @apply text-[17px] leading-relaxed text-muted-fg;
   }
   .prose-legal ul {
-    @apply list-disc space-y-1 pl-5;
+    @apply list-disc space-y-1.5 pl-5;
   }
 }
 

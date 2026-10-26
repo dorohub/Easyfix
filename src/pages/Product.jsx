@@ -4,48 +4,45 @@ import { useLang } from '../i18n.jsx'
 import { useCart } from '../lib/cart.jsx'
 import { categoryBySlug, contact } from '../data/site.js'
 import { formatPrice, getProduct, getSimilar, maxQty } from '../lib/catalog.js'
-import ProductCard, { Ribbon } from '../components/ProductCard.jsx'
+import ProductCard, { Badge } from '../components/ProductCard.jsx'
+import Rail from '../components/Rail.jsx'
 import Icon, { WhatsAppGlyph } from '../components/Icon.jsx'
 import { Reveal } from '../components/Motion.jsx'
 import NotFound from './NotFound.jsx'
 
-function ShareButtons({ product }) {
+function ShareRow({ product }) {
   const { t } = useLang()
   const [copied, setCopied] = useState(false)
   const url = typeof window !== 'undefined' ? window.location.href : ''
   const text = `${product.name} — ${formatPrice(product.price)}`
   const enc = encodeURIComponent
   const links = [
-    ['WhatsApp', `https://wa.me/?text=${enc(`${text} ${url}`)}`, 'bg-[#25d366] text-white'],
-    ['Facebook', `https://www.facebook.com/sharer/sharer.php?u=${enc(url)}`, 'bg-[#1877f2] text-white'],
-    ['X', `https://twitter.com/intent/tweet?text=${enc(text)}&url=${enc(url)}`, 'bg-black text-white'],
-    ['Messenger', `fb-messenger://share/?link=${enc(url)}`, 'bg-[#0084ff] text-white'],
-    ['Email', `mailto:?subject=${enc(product.name)}&body=${enc(`${text}\n${url}`)}`, 'bg-muted text-brand'],
+    ['WhatsApp', `https://wa.me/?text=${enc(`${text} ${url}`)}`],
+    ['Facebook', `https://www.facebook.com/sharer/sharer.php?u=${enc(url)}`],
+    ['X', `https://twitter.com/intent/tweet?text=${enc(text)}&url=${enc(url)}`],
+    ['Messenger', `fb-messenger://share/?link=${enc(url)}`],
+    ['Email', `mailto:?subject=${enc(product.name)}&body=${enc(`${text}\n${url}`)}`],
   ]
   return (
-    <div>
-      <p className="mb-3 text-xs font-bold tracking-widest text-muted-fg uppercase">{t.share}</p>
-      <div className="flex flex-wrap gap-2">
-        {links.map(([label, href, cls]) => (
-          <a key={label} href={href} target="_blank" rel="noreferrer" className={`rounded-lg px-3.5 py-2 text-sm font-semibold transition hover:opacity-85 ${cls}`}>
-            {label}
-          </a>
-        ))}
-        <button
-          type="button"
-          onClick={async () => {
-            try {
-              await navigator.clipboard.writeText(url)
-              setCopied(true)
-              setTimeout(() => setCopied(false), 2000)
-            } catch {}
-          }}
-          className="flex items-center gap-1.5 rounded-lg bg-muted px-3.5 py-2 text-sm font-semibold hover:bg-border"
-        >
-          <Icon name={copied ? 'check' : 'link'} size={16} />
-          {copied ? t.linkCopied : t.copyLink}
-        </button>
-      </div>
+    <div className="flex flex-wrap items-center gap-x-4 gap-y-2 text-[13px]">
+      <span className="font-semibold">{t.share}</span>
+      {links.map(([label, href]) => (
+        <a key={label} href={href} target="_blank" rel="noreferrer" className="text-muted-fg transition hover:text-primary">{label}</a>
+      ))}
+      <button
+        type="button"
+        onClick={async () => {
+          try {
+            await navigator.clipboard.writeText(url)
+            setCopied(true)
+            setTimeout(() => setCopied(false), 2000)
+          } catch {}
+        }}
+        className="flex cursor-pointer items-center gap-1 text-muted-fg transition hover:text-primary"
+      >
+        <Icon name={copied ? 'check' : 'link'} size={14} />
+        {copied ? t.linkCopied : t.copyLink}
+      </button>
     </div>
   )
 }
@@ -59,93 +56,95 @@ export default function Product() {
   if (!product) return <NotFound />
 
   const category = categoryBySlug[product.category]
-  const similar = getSimilar(product)
+  const similar = getSimilar(product, 8)
   const limit = maxQty(product)
   const ask = `${contact.whatsapp}?text=${encodeURIComponent(`Hi EasyFix, I'm interested in: ${product.name}`)}`
 
   return (
     <>
-      <div className="container-x py-6 sm:py-10">
-        <nav className="mb-6 flex flex-wrap items-center gap-1.5 text-sm text-muted-fg" aria-label="Breadcrumb">
-          <Link to="/" className="hover:text-primary">{t.nav.home}</Link>
-          <Icon name="chevronRight" size={14} />
-          <Link to="/shop" className="hover:text-primary">{t.nav.shop}</Link>
+      <div className="container-x pt-6 pb-16 sm:pt-10 sm:pb-24">
+        <nav className="mb-8 flex flex-wrap items-center gap-1 text-[12px] text-muted-fg" aria-label="Breadcrumb">
+          <Link to="/" className="hover:text-brand">{t.nav.home}</Link>
+          <Icon name="chevronRight" size={12} />
+          <Link to="/shop" className="hover:text-brand">{t.nav.shop}</Link>
           {category && (
             <>
-              <Icon name="chevronRight" size={14} />
-              <Link to={`/category/${category.slug}`} className="hover:text-primary">{pick(category.name)}</Link>
+              <Icon name="chevronRight" size={12} />
+              <Link to={`/category/${category.slug}`} className="hover:text-brand">{pick(category.name)}</Link>
             </>
           )}
         </nav>
 
-        <div className="grid gap-8 lg:grid-cols-[1.1fr_1fr] lg:gap-14">
-          <div className="relative overflow-hidden rounded-3xl border border-border bg-gradient-to-b from-[#f8f8f8] to-muted">
-            <Ribbon product={product} size="lg" />
-            <div className="aspect-square">
-              {product.image && <img src={product.image} alt={product.name} className="size-full object-contain p-8 mix-blend-multiply sm:p-12" />}
+        <div className="grid gap-10 lg:grid-cols-[1.25fr_1fr] lg:gap-16">
+          <div className="lg:sticky lg:top-20 lg:self-start">
+            <div className="relative overflow-hidden rounded-[36px] bg-muted">
+              <div className="aspect-square">
+                {product.image && <img src={product.image} alt={product.name} className="size-full object-contain p-10 mix-blend-multiply sm:p-16" />}
+              </div>
             </div>
           </div>
 
-          <div className="lg:py-4">
-            <p className="text-xs font-bold tracking-widest text-muted-fg uppercase">{product.brand}</p>
-            <h1 className="mt-2 text-[26px] leading-tight font-extrabold sm:text-4xl">{product.name}</h1>
-            <p className="mt-5 text-4xl font-extrabold tracking-tight text-primary sm:text-5xl">{formatPrice(product.price)}</p>
-            <p className="mt-1 text-xs text-muted-fg">{t.vatIncluded}</p>
+          <div className="lg:pt-6">
+            <Badge product={product} className="text-[14px]" />
+            <h1 className="mt-2 text-[28px] leading-[1.12] font-bold tracking-[-0.03em] sm:text-[36px]">{product.name}</h1>
+            <p className="mt-2 text-muted-fg">{product.brand}{category ? ` · ${pick(category.name)}` : ''}</p>
+            <p className="mt-8 text-[32px] font-semibold tracking-[-0.03em]">{formatPrice(product.price)}</p>
+            <p className="text-[12px] text-muted-fg">{t.vatIncluded}</p>
 
-            <p className={`mt-4 inline-flex items-center gap-2 rounded-full px-3 py-1 text-sm font-semibold ${product.inStock ? 'bg-emerald-50 text-success' : 'bg-rose-50 text-destructive'}`}>
-              <span className={`size-2 rounded-full ${product.inStock ? 'bg-success' : 'bg-destructive'}`} />
-              {product.inStock ? (product.stock ? t.inStockCount(product.stock) : t.inStock) : t.outOfStock}
-            </p>
-
-            <dl className="mt-6 grid grid-cols-2 gap-3 text-sm">
-              <div className="rounded-xl bg-muted px-4 py-3">
-                <dt className="text-xs text-muted-fg">{t.condition}</dt>
-                <dd className="font-semibold">{product.condition === 'used' ? t.conditionUsed : t.conditionNew}{product.grade && product.grade !== 'used' ? ` · ${t.badge[product.grade]}` : ''}</dd>
+            <div className="mt-8 grid gap-3 rounded-[24px] border border-border p-5">
+              <div className="flex items-center justify-between text-[15px]">
+                <span className="text-muted-fg">{t.condition}</span>
+                <span className="font-semibold">{product.condition === 'used' ? t.conditionUsed : t.conditionNew}{product.grade && product.grade !== 'used' ? ` · ${t.badge[product.grade]}` : ''}</span>
               </div>
-              {category && (
-                <div className="rounded-xl bg-muted px-4 py-3">
-                  <dt className="text-xs text-muted-fg">{t.category}</dt>
-                  <dd className="font-semibold">{pick(category.name)}</dd>
-                </div>
-              )}
-            </dl>
-
-            <div className="mt-7 flex flex-wrap items-stretch gap-3">
-              <div className="flex items-center rounded-lg border border-border">
-                <button type="button" onClick={() => setQty((q) => Math.max(1, q - 1))} className="grid size-12 place-items-center hover:text-primary" aria-label="−" disabled={!product.inStock}><Icon name="minus" size={18} /></button>
-                <span className="w-10 text-center text-lg font-semibold" aria-label={t.quantity}>{qty}</span>
-                <button type="button" onClick={() => setQty((q) => Math.min(limit, q + 1))} className="grid size-12 place-items-center hover:text-primary" aria-label="+" disabled={!product.inStock}><Icon name="plus" size={18} /></button>
+              <div className="h-px bg-border" />
+              <div className="flex items-center justify-between text-[15px]">
+                <span className="text-muted-fg">{t.inStock}</span>
+                <span className={`flex items-center gap-2 font-semibold ${product.inStock ? 'text-success' : 'text-destructive'}`}>
+                  <span className={`size-2 rounded-full ${product.inStock ? 'bg-success' : 'bg-destructive'}`} />
+                  {product.inStock ? (product.stock ? t.inStockCount(product.stock) : t.inStock) : t.outOfStock}
+                </span>
               </div>
-              <button type="button" disabled={!product.inStock} onClick={() => add(product.id, qty)} className="btn-primary min-w-48 flex-1 px-8 py-3.5 text-base">
-                <Icon name="cart" size={20} />
+            </div>
+
+            <div className="mt-6 flex items-stretch gap-3">
+              <div className="flex items-center rounded-full bg-muted">
+                <button type="button" onClick={() => setQty((q) => Math.max(1, q - 1))} className="grid size-12 cursor-pointer place-items-center rounded-full hover:text-primary disabled:opacity-40" aria-label="−" disabled={!product.inStock || qty <= 1}><Icon name="minus" size={17} /></button>
+                <span className="w-8 text-center text-[17px] font-semibold" aria-label={t.quantity}>{qty}</span>
+                <button type="button" onClick={() => setQty((q) => Math.min(limit, q + 1))} className="grid size-12 cursor-pointer place-items-center rounded-full hover:text-primary disabled:opacity-40" aria-label="+" disabled={!product.inStock || qty >= limit}><Icon name="plus" size={17} /></button>
+              </div>
+              <button type="button" disabled={!product.inStock} onClick={() => add(product.id, qty)} className="btn-primary flex-1 py-3.5 text-[17px]">
                 {product.inStock ? t.addToCart : t.outOfStock}
               </button>
             </div>
-            <a href={ask} target="_blank" rel="noreferrer" className="btn mt-3 w-full border border-[#25d366] py-3 text-[#128c4b] hover:bg-[#25d366] hover:text-white">
-              <WhatsAppGlyph size={20} />
+            <a href={ask} target="_blank" rel="noreferrer" className="link-arrow mt-5 text-[15px] text-[#128c4b]">
+              <WhatsAppGlyph size={18} />
               {t.askWhatsApp}
+              <Icon name="chevronRight" size={15} />
             </a>
 
-            <ul className="mt-7 grid gap-3 border-y border-border py-5 text-sm">
-              <li className="flex items-center gap-3"><Icon name="truck" size={19} className="text-primary" />{t.pickup}</li>
-              <li className="flex items-center gap-3"><Icon name="shield" size={19} className="text-primary" />{t.usp.warranty} · {t.usp.returns}</li>
+            <ul className="mt-10 grid gap-5 border-t border-border pt-8 text-[15px]">
+              <li className="flex gap-4"><Icon name="truck" size={22} className="shrink-0 text-primary" /><span>{t.pickup}</span></li>
+              <li className="flex gap-4"><Icon name="shield" size={22} className="shrink-0 text-primary" /><span>{t.usp.warranty} · {t.usp.returns}</span></li>
+              <li className="flex gap-4"><Icon name="store" size={22} className="shrink-0 text-primary" /><span>Zinas Kanther 2 · Georgiou A 14, Limassol</span></li>
             </ul>
 
-            <div className="mt-6">
-              <ShareButtons product={product} />
+            <div className="mt-8 border-t border-border pt-6">
+              <ShareRow product={product} />
             </div>
           </div>
         </div>
       </div>
 
       {similar.length > 0 && (
-        <Reveal className="container-x border-t border-border py-14" deps={[id]}>
-          <h2 className="mb-7 text-2xl font-extrabold sm:text-3xl" data-reveal>{t.similar}</h2>
-          <div className="grid grid-cols-2 gap-3 sm:gap-5 md:grid-cols-4">
-            {similar.map((p) => (
-              <ProductCard key={p.id} product={p} />
-            ))}
+        <Reveal className="bg-muted pt-16 sm:pt-20" deps={[id]}>
+          <div className="container-x">
+            <h2 className="display-md" data-reveal>{t.similar}</h2>
           </div>
+          <Rail label={t.similar} className="mt-8 pb-6">
+            {similar.map((p) => (
+              <ProductCard key={p.id} product={p} variant="rail" />
+            ))}
+          </Rail>
         </Reveal>
       )}
     </>

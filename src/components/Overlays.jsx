@@ -21,9 +21,9 @@ export function PreviewBanner() {
   })
   if (!IS_PREVIEW || hidden) return null
   return (
-    <div className="relative bg-primary text-primary-fg" role="note">
-      <p className="container-x py-2 pr-12 text-center text-[13px] leading-snug font-semibold sm:text-sm">
-        <Icon name="bolt" size={15} className="mr-1.5 inline -translate-y-px" />
+    <div className="relative bg-brand text-white" role="note">
+      <p className="container-x py-2 pr-12 text-center text-[12px] leading-snug font-medium sm:text-[13px]">
+        <Icon name="bolt" size={14} className="mr-1.5 inline -translate-y-px text-primary" />
         {t.preview.text}
       </p>
       <button
@@ -34,7 +34,7 @@ export function PreviewBanner() {
             sessionStorage.setItem(PREVIEW_KEY, 'hidden')
           } catch {}
         }}
-        className="absolute top-1/2 right-2 grid size-9 -translate-y-1/2 place-items-center rounded-full hover:bg-black/10"
+        className="absolute top-1/2 right-2 grid size-9 -translate-y-1/2 cursor-pointer place-items-center rounded-full hover:bg-white/10"
         aria-label={t.close}
       >
         <Icon name="x" size={18} />
@@ -64,8 +64,8 @@ export function CookieBanner() {
 
   if (!visible) return null
   return (
-    <div className="fixed inset-x-3 bottom-3 z-[80] mx-auto max-w-3xl rounded-2xl border border-border bg-white p-4 shadow-[var(--shadow-lift)] sm:inset-x-6 sm:bottom-6 sm:flex sm:items-center sm:gap-6 sm:p-5" role="dialog" aria-live="polite" aria-label="Cookies">
-      <p className="text-sm leading-relaxed text-muted-fg">
+    <div className="fixed inset-x-3 bottom-3 z-[80] mx-auto max-w-3xl rounded-[24px] border border-black/5 p-4 shadow-[var(--shadow-lift)] glass sm:inset-x-6 sm:bottom-6 sm:flex sm:items-center sm:gap-6 sm:p-5" role="dialog" aria-live="polite" aria-label="Cookies">
+      <p className="text-[13px] leading-relaxed text-muted-fg">
         {t.cookie.text}{' '}
         <Link to="/cookies" className="font-semibold text-primary underline-offset-2 hover:underline">{t.cookie.policy}</Link>
       </p>
@@ -85,9 +85,9 @@ export function WhatsAppButton() {
       target="_blank"
       rel="noreferrer"
       aria-label={t.whatsapp}
-      className="group fixed right-4 bottom-4 z-[60] flex items-center gap-2 rounded-full bg-[#25d366] p-3.5 text-white shadow-[0_12px_30px_-8px_rgb(37_211_102/0.7)] transition hover:scale-105 sm:right-6 sm:bottom-6"
+      className="group fixed right-4 bottom-4 z-[60] flex items-center gap-2 rounded-full bg-[#25d366] p-3 text-white shadow-[0_12px_30px_-10px_rgb(37_211_102/0.8)] transition duration-300 hover:scale-105 sm:right-6 sm:bottom-6"
     >
-      <WhatsAppGlyph size={28} />
+      <WhatsAppGlyph size={26} />
       <span className="hidden max-w-0 overflow-hidden text-sm font-semibold whitespace-nowrap transition-all duration-300 group-hover:max-w-40 group-hover:pr-1 sm:inline">{t.whatsapp}</span>
     </a>
   )
@@ -100,10 +100,10 @@ export function CartToast() {
   return (
     <div className={`pointer-events-none fixed top-24 left-1/2 z-[90] -translate-x-1/2 transition-all duration-300 ${line ? 'translate-y-0 opacity-100' : '-translate-y-3 opacity-0'}`} role="status" aria-live="polite">
       {line && (
-        <div key={toast.key} className="pointer-events-auto flex items-center gap-3 rounded-2xl bg-brand py-2.5 pr-3 pl-2.5 text-white shadow-[var(--shadow-lift)]">
+        <div key={toast.key} className="pointer-events-auto flex items-center gap-3 rounded-full py-2 pr-2 pl-2 text-white shadow-[var(--shadow-lift)] glass-dark">
           <span className="grid size-9 place-items-center rounded-full bg-primary text-primary-fg"><Icon name="check" size={18} strokeWidth={2.5} /></span>
           <span className="max-w-[48vw] truncate text-sm font-medium sm:max-w-xs">{t.added}</span>
-          <Link to="/cart" className="rounded-lg bg-white/10 px-3 py-1.5 text-xs font-bold hover:bg-white/20">{t.cart}</Link>
+          <Link to="/cart" className="rounded-full bg-primary px-4 py-1.5 text-xs font-bold text-primary-fg hover:bg-primary-600">{t.cart}</Link>
         </div>
       )}
     </div>

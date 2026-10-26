@@ -8,7 +8,7 @@ import ProductCard from '../components/ProductCard.jsx'
 import Icon from '../components/Icon.jsx'
 import { Reveal } from '../components/Motion.jsx'
 
-function Filters({ params, setParam, brands, activeCategory, onReset }) {
+function Filters({ params, setParam, brands, activeCategory, onReset, showCategories = false }) {
   const { t, pick } = useLang()
   const [q, setQ] = useState(params.get('q') ?? '')
   useEffect(() => setQ(params.get('q') ?? ''), [params])
@@ -21,15 +21,15 @@ function Filters({ params, setParam, brands, activeCategory, onReset }) {
           setParam('q', q.trim())
         }}
       >
-        <label className="mb-2 block text-xs font-bold tracking-widest text-muted-fg uppercase" htmlFor="shop-search">{t.search}</label>
+        <label className="mb-2 block text-[12px] font-semibold text-muted-fg" htmlFor="shop-search">{t.search}</label>
         <div className="relative">
           <Icon name="search" size={17} className="absolute top-1/2 left-3 -translate-y-1/2 text-muted-fg" />
           <input id="shop-search" type="search" value={q} onChange={(e) => setQ(e.target.value)} onBlur={() => setParam('q', q.trim())} placeholder={t.search + '…'} className="input pl-9" />
         </div>
       </form>
 
-      <div>
-        <p className="mb-2 text-xs font-bold tracking-widest text-muted-fg uppercase">{t.categoriesLabel}</p>
+      {showCategories && <div>
+        <p className="mb-2 text-[12px] font-semibold text-muted-fg">{t.categoriesLabel}</p>
         <nav className="grid gap-0.5">
           <Link to={{ pathname: '/shop', search: params.toString() }} className={`rounded-lg px-3 py-2 text-[15px] font-semibold ${!activeCategory ? 'bg-accent text-primary' : 'hover:bg-muted'}`}>
             {t.allProducts}
@@ -45,10 +45,10 @@ function Filters({ params, setParam, brands, activeCategory, onReset }) {
             </Link>
           ))}
         </nav>
-      </div>
+      </div>}
 
       <div>
-        <p className="mb-2 text-xs font-bold tracking-widest text-muted-fg uppercase">{t.brand}</p>
+        <p className="mb-2 text-[12px] font-semibold text-muted-fg">{t.brand}</p>
         <div className="flex flex-wrap gap-2">
           {[null, ...brands].map((b) => {
             const active = (params.get('brand') ?? null) === b
@@ -57,7 +57,7 @@ function Filters({ params, setParam, brands, activeCategory, onReset }) {
                 key={b ?? 'all'}
                 type="button"
                 onClick={() => setParam('brand', b ?? '')}
-                className={`rounded-full border px-3.5 py-1.5 text-sm font-medium transition ${active ? 'border-brand bg-brand text-white' : 'border-border hover:border-brand'}`}
+                className={`cursor-pointer rounded-full px-3.5 py-1.5 text-[14px] font-medium transition ${active ? 'bg-brand text-white' : 'bg-muted hover:bg-border'}`}
                 aria-pressed={active}
               >
                 {b ?? t.all}
@@ -68,7 +68,7 @@ function Filters({ params, setParam, brands, activeCategory, onReset }) {
       </div>
 
       <div>
-        <p className="mb-2 text-xs font-bold tracking-widest text-muted-fg uppercase">{t.price}</p>
+        <p className="mb-2 text-[12px] font-semibold text-muted-fg">{t.price}</p>
         <div className="flex items-center gap-2">
           <input type="number" min="0" inputMode="numeric" placeholder={t.min} defaultValue={params.get('min') ?? ''} key={'min' + (params.get('min') ?? '')} onBlur={(e) => setParam('min', e.target.value)} className="input" aria-label={t.min} />
           <span className="text-muted-fg">–</span>
@@ -125,46 +125,58 @@ export default function Shop() {
 
   return (
     <>
-      <div className="bg-brand text-white">
-        <div className="container-x flex flex-wrap items-end justify-between gap-3 py-9 sm:py-12">
-          <div>
-            <nav className="mb-3 flex items-center gap-1.5 text-sm text-white/60" aria-label="Breadcrumb">
-              <Link to="/" className="hover:text-primary">{t.nav.home}</Link>
-              <Icon name="chevronRight" size={14} />
-              {category ? (
-                <>
-                  <Link to="/shop" className="hover:text-primary">{t.nav.shop}</Link>
-                  <Icon name="chevronRight" size={14} />
-                  <span className="text-white">{title}</span>
-                </>
-              ) : (
-                <span className="text-white">{t.nav.shop}</span>
-              )}
-            </nav>
-            <h1 className="text-3xl font-extrabold sm:text-[44px]">{title}</h1>
-            {filters.q && <p className="mt-2 text-white/70">“{filters.q}”</p>}
-          </div>
-          <p className="text-sm text-white/70">{t.products(products.length)}</p>
+      <div className="container-x pt-10 sm:pt-16">
+        <nav className="mb-4 flex items-center gap-1 text-[12px] text-muted-fg" aria-label="Breadcrumb">
+          <Link to="/" className="hover:text-brand">{t.nav.home}</Link>
+          <Icon name="chevronRight" size={12} />
+          {category ? (
+            <>
+              <Link to="/shop" className="hover:text-brand">{t.nav.shop}</Link>
+              <Icon name="chevronRight" size={12} />
+              <span className="text-brand">{title}</span>
+            </>
+          ) : (
+            <span className="text-brand">{t.nav.shop}</span>
+          )}
+        </nav>
+        <div className="flex flex-wrap items-end justify-between gap-4">
+          <h1 className="display-lg">
+            {title}
+            {filters.q && <span className="text-muted-fg"> “{filters.q}”</span>}
+          </h1>
+          <p className="pb-2 text-[15px] text-muted-fg">{t.products(products.length)}</p>
         </div>
       </div>
 
-      <div className="container-x grid gap-8 py-8 lg:grid-cols-[264px_1fr] lg:py-10">
+      {/* category chips */}
+      <div className="no-scrollbar mt-8 flex gap-2 overflow-x-auto px-[max(20px,calc((100vw-1200px)/2+32px))] pb-2" data-lenis-prevent-horizontal>
+        <Link to={{ pathname: '/shop', search: params.toString() }} className={`shrink-0 rounded-full px-4 py-2 text-[14px] font-semibold transition ${!slug ? 'bg-brand text-white' : 'bg-muted hover:bg-border'}`}>
+          {t.allProducts}
+        </Link>
+        {categories.map((c) => (
+          <Link key={c.slug} to={{ pathname: `/category/${c.slug}`, search: params.toString() }} className={`shrink-0 rounded-full px-4 py-2 text-[14px] font-semibold whitespace-nowrap transition ${slug === c.slug ? 'bg-brand text-white' : 'bg-muted hover:bg-border'}`}>
+            {pick(c.name)}
+          </Link>
+        ))}
+      </div>
+
+      <div className="container-x grid gap-10 pt-8 pb-20 lg:grid-cols-[240px_1fr] lg:pt-10">
         <aside className="hidden lg:block">
-          <div className="sticky top-28">
+          <div className="sticky top-20">
             <Filters params={params} setParam={setParam} brands={brands} activeCategory={slug} onReset={reset} />
           </div>
         </aside>
 
         <div>
           <div className="mb-5 flex items-center justify-between gap-3">
-            <button type="button" onClick={() => setDrawer(true)} className="btn-outline lg:hidden">
+            <button type="button" onClick={() => setDrawer(true)} className="btn-outline py-2 text-[14px] lg:hidden">
               <Icon name="filter" size={17} />
               {t.filters}
             </button>
-            <p className="hidden text-sm text-muted-fg lg:block">{t.products(products.length)}</p>
+            <span className="hidden lg:block" />
             <label className="flex items-center gap-2 text-sm">
               <span className="hidden text-muted-fg sm:inline">{t.sort}</span>
-              <select value={filters.sort} onChange={(e) => setParam('sort', e.target.value === 'featured' ? '' : e.target.value)} className="input w-auto cursor-pointer py-2 pr-8">
+              <select value={filters.sort} onChange={(e) => setParam('sort', e.target.value === 'featured' ? '' : e.target.value)} className="input w-auto cursor-pointer rounded-full py-2 pr-8 text-[14px]">
                 {Object.entries(t.sortOptions).map(([k, label]) => (
                   <option key={k} value={k}>{label}</option>
                 ))}
@@ -173,7 +185,7 @@ export default function Shop() {
           </div>
 
           {products.length ? (
-            <Reveal className="grid grid-cols-2 gap-3 sm:gap-5 md:grid-cols-3 xl:grid-cols-4" deps={[slug, params.toString()]}>
+            <Reveal className="grid grid-cols-2 gap-3 sm:gap-5 md:grid-cols-3" deps={[slug, params.toString()]}>
               {products.map((p) => (
                 <ProductCard key={p.id} product={p} />
               ))}
@@ -197,7 +209,7 @@ export default function Shop() {
             <button type="button" onClick={() => setDrawer(false)} className="grid size-10 place-items-center rounded-full hover:bg-muted" aria-label={t.close}><Icon name="x" /></button>
           </div>
           <div className="overflow-y-auto overscroll-contain px-5 py-5" data-lenis-prevent>
-            <Filters params={params} setParam={setParam} brands={brands} activeCategory={slug} onReset={reset} />
+            <Filters params={params} setParam={setParam} brands={brands} activeCategory={slug} onReset={reset} showCategories />
           </div>
           <div className="border-t border-border p-4">
             <button type="button" onClick={() => setDrawer(false)} className="btn-primary w-full py-3">{t.showResults(products.length)}</button>

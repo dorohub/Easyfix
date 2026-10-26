@@ -4,84 +4,66 @@ import { useCart } from '../lib/cart.jsx'
 import { formatPrice } from '../lib/catalog.js'
 import Icon from './Icon.jsx'
 
-// Corner ribbons in the same colour scheme as the current site.
-const ribbonStyle = {
-  new: 'from-emerald-500 to-emerald-700',
-  used: 'from-emerald-400 to-emerald-600',
-  pulled: 'from-amber-500 to-yellow-600',
-  service_pack: 'from-orange-400 to-orange-600',
-  original: 'from-yellow-400 to-amber-600',
-  out: 'from-rose-500 to-rose-700',
-}
-
-export function ribbonKey(p) {
+export function badgeKey(p) {
   if (!p.inStock) return 'out'
   return p.grade ?? 'new'
 }
 
-export function Ribbon({ product, size = 'md' }) {
+// Small text label (Apple "New"-style) instead of the old corner ribbons. Same states as the current site.
+export function Badge({ product, className = '' }) {
   const { t } = useLang()
-  const key = ribbonKey(product)
-  const big = size === 'lg'
-  return (
-    <div className={`pointer-events-none absolute top-0 left-0 z-10 overflow-hidden ${big ? 'size-32' : 'size-24'}`}>
-      <span
-        className={`absolute -rotate-45 bg-gradient-to-br text-center font-bold tracking-wider text-white uppercase shadow-md ${ribbonStyle[key]} ${
-          big ? 'top-[24px] -left-[42px] w-[180px] py-1.5 text-xs' : 'top-[18px] -left-[34px] w-[140px] py-1 text-[10.5px]'
-        }`}
-      >
-        {t.badge[key]}
-      </span>
-    </div>
-  )
+  const key = badgeKey(product)
+  const tone = key === 'out' ? 'text-destructive' : key === 'new' ? 'text-success' : 'text-primary'
+  return <p className={`text-[12px] font-semibold ${tone} ${className}`}>{t.badge[key]}</p>
 }
 
-export default function ProductCard({ product }) {
+export default function ProductCard({ product, variant = 'grid' }) {
   const { t } = useLang()
   const { add } = useCart()
   const to = `/product/${product.id}`
+  const wide = variant === 'rail'
 
   return (
-    <article className="group relative flex h-full flex-col overflow-hidden rounded-[var(--radius-card)] border border-border bg-white transition duration-300 hover:-translate-y-1 hover:border-transparent hover:shadow-[var(--shadow-lift)]" data-reveal-item>
-      <Link to={to} className="relative block aspect-square overflow-hidden bg-gradient-to-b from-[#f7f7f7] to-muted" tabIndex={-1} aria-hidden="true">
-        <Ribbon product={product} />
+    <article
+      className={`group relative flex h-full flex-col rounded-[var(--radius-card)] bg-white shadow-[var(--shadow-card)] transition duration-500 ease-(--ease-out-expo) hover:-translate-y-1 hover:shadow-[var(--shadow-lift)] ${wide ? 'w-[72vw] shrink-0 snap-start sm:w-[300px]' : ''}`}
+      data-reveal-item
+    >
+      <div className="px-5 pt-5 sm:px-6 sm:pt-6">
+        <Badge product={product} />
+      </div>
+      <Link to={to} className="relative mx-auto flex aspect-square w-full items-center justify-center px-6 py-2" tabIndex={-1} aria-hidden="true">
         {product.image ? (
           <img
             src={product.image}
             alt=""
             loading="lazy"
             decoding="async"
-            className={`size-full object-contain p-4 mix-blend-multiply transition duration-500 group-hover:scale-[1.06] sm:p-5 ${product.inStock ? '' : 'opacity-60 grayscale-[40%]'}`}
+            className={`max-h-full max-w-full rounded-[18px] object-contain mix-blend-multiply transition duration-700 ease-(--ease-out-expo) group-hover:scale-[1.05] ${product.inStock ? '' : 'opacity-50 grayscale'}`}
           />
         ) : (
           <div className="grid size-full place-items-center text-border"><Icon name="phone" size={64} /></div>
         )}
       </Link>
-      <div className="flex flex-1 flex-col p-3.5 sm:p-4">
-        <p className="text-[10.5px] font-semibold tracking-wider text-muted-fg uppercase">{product.brand ?? '—'}</p>
-        <h3 className="mt-1 line-clamp-2 min-h-[2.6em] text-[13.5px] leading-snug font-medium sm:text-sm">
-          <Link to={to} className="transition after:absolute after:inset-0 after:content-[''] hover:text-primary">
+      <div className="flex flex-1 flex-col px-5 pb-5 sm:px-6 sm:pb-6">
+        <p className="text-[12px] font-medium text-muted-fg">{product.brand ?? ' '}</p>
+        <h3 className="mt-0.5 line-clamp-2 text-[15px] leading-snug font-semibold tracking-[-0.015em] sm:text-[16px]">
+          <Link to={to} className="after:absolute after:inset-0 after:rounded-[var(--radius-card)] after:content-['']">
             {product.name}
           </Link>
         </h3>
-        <div className="mt-auto flex items-end justify-between gap-2 pt-3">
-          <p className="text-lg font-extrabold tracking-tight text-primary sm:text-xl">{formatPrice(product.price)}</p>
+        <div className="mt-auto flex items-center justify-between gap-3 pt-4">
+          <p className="text-[15px] font-semibold tracking-tight sm:text-[16px]">{formatPrice(product.price)}</p>
+          <button
+            type="button"
+            disabled={!product.inStock}
+            onClick={() => add(product.id)}
+            aria-label={product.inStock ? `${t.addToCart}: ${product.name}` : t.outOfStock}
+            title={product.inStock ? t.addToCart : t.outOfStock}
+            className="relative z-10 grid size-9 shrink-0 cursor-pointer place-items-center rounded-full bg-primary text-primary-fg transition duration-300 hover:scale-110 hover:bg-primary-600 active:scale-95 disabled:cursor-not-allowed disabled:bg-muted disabled:text-muted-fg disabled:hover:scale-100"
+          >
+            <Icon name="plus" size={18} strokeWidth={2.4} />
+          </button>
         </div>
-        <button
-          type="button"
-          disabled={!product.inStock}
-          onClick={() => add(product.id)}
-          className="btn-primary relative z-10 mt-3 w-full py-2 text-[13px] sm:text-sm"
-        >
-          {product.inStock ? (
-            <>
-              <Icon name="cart" size={17} />
-              {t.addToCart}
-            </>
-          ) : (
-            t.outOfStock
-          )}
-        </button>
       </div>
     </article>
   )

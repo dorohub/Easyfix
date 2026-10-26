@@ -17,36 +17,40 @@ The site is a single-page app. When hosting it, rewrite all paths to `index.html
 
 ### Draft mode
 
-By default the build is a **design draft**: an orange banner (EN/EL/RU) says orders and logins are not active
+By default the build is a **design draft**: a slim banner (EN/EL/RU) says orders and logins are not active
 yet, and `<meta name="robots" content="noindex, nofollow">` keeps search engines from indexing it. For the real
 launch, set the environment variable `VITE_PREVIEW=false` (e.g. in Vercel → Project → Settings → Environment
 Variables) and redeploy — banner and noindex disappear.
 
-## Kept 1:1 from the current site
+## Kept from the current site
 
-- **Colours**: primary orange `#f68000`, brand black `#0b0b0b`, top bar `#030303`, accent `#ffeede`,
-  muted `#f2f2f2`, border `#e1e1e1` (see `@theme` in `src/index.css`)
-- **Structure**: top bar (phone, email, EN/ΕΛ/RU) → header (logo, search, Wholesale, Login, cart) → black main
-  nav → orange category bar → hero slider (Samsung, Xiaomi, Repair, iPhone) → Shop by category → New / Used /
-  iPad products → footer with Wolt links
+- **Colours**: primary orange `#f68000`, brand black `#0b0b0b`, accent `#ffeede`, muted `#f2f2f2`,
+  border `#e1e1e1` (see `@theme` in `src/index.css`) — orange stays the only accent colour
 - **Pages**: Home, Shop, Category, Product, Cart, Repairs, About, Contact, Wholesale, Login, Terms, Privacy,
   Cookies, Shipping & Returns, GDPR, Shipping, Payment
-- **Content**: texts, stores (Zinas Kanther 2 Limassol, Georgiou A 14 Germasogeia), phone, email, Wolt venues,
-  product ribbons (In stock / Used / Pulled / Service Pack / Original / Out of stock), legal texts, cookie consent,
-  WhatsApp button
+- **Content**: hero messages (Samsung, Xiaomi, Repair, iPhone), categories, New / Used / iPad product sections,
+  stores (Zinas Kanther 2 Limassol, Georgiou A 14 Germasogeia), phone, email, Wolt venues, product states
+  (In stock / Used / Pulled / Service Pack / Original / Out of stock), legal texts, cookie consent, WhatsApp button
 
-## Improved
+## Design — Apple-level redesign
 
-- Orange category bar no longer overflows the page — it scrolls with arrows
-- Sticky header with search, cart badge and "added to cart" toast
-- Animated hero slider (autoplay with progress, swipe on mobile), repair slide with its own graphic
-- Category tiles with icons, USP bar, repair band, wholesale band with Vanta NET background, Wolt band
-- Shop: sidebar filters (category, brand, price, in stock, search, sort), mobile filter sheet
-- Product page: quantity, WhatsApp enquiry, share buttons, similar products
-- Cart page with free-shipping progress (€60)
-- Full EN / ΕΛ / RU UI translation (Russian was mostly untranslated on the current site)
-- Lenis smooth scroll synced with GSAP ScrollTrigger reveals; respects `prefers-reduced-motion`
-- Mobile-first, tested at 390 px and 1440 px
+Direction from the `ui-ux-pro-max` skill ("Liquid Glass", Inter type scale, max. one pinned scroll section):
+
+- **One slim glass navigation bar** (replaces top bar + header + black nav + orange category bar):
+  "Shop" opens a full-width mega menu with all categories, a search layer with popular searches, cart badge,
+  EN/ΕΛ/RU switch; full-screen menu on phones; thin info ribbon (free shipping / same-day repairs) below
+- **Hero**: big statement headline, iPhone line-up that zooms as you scroll
+- **Home**: category icon rail, swipeable promo cards (the four slides of the current site), swipeable product
+  rails, "Why EasyFix" bento grid, one pinned statement whose words light up while scrolling, dark repair
+  section, wholesale card with Vanta NET background, store cards
+- **Product cards**: large white cards, small text badge instead of corner ribbons, round "+" add button
+- **Shop**: big title, category chips, slim filter sidebar (brand, price, in stock, search, sort), mobile sheet
+- **Product page**: Apple-style buy layout — sticky image, price, condition/stock box, quantity + add to cart,
+  WhatsApp enquiry, delivery & warranty info, share links, similar-products rail
+- Light Apple-style footer, glass cookie banner and "added to cart" toast
+- Lenis smooth scroll synced with GSAP ScrollTrigger; everything respects `prefers-reduced-motion`
+- Full EN / ΕΛ / RU UI translation; nav labels fit on one line in all three languages
+- Tested at 390 px, 1024 px, 1280 px and 1440 px — no console errors, no horizontal scrolling
 
 ## Data — what is real and what still needs the backend
 
@@ -70,7 +74,7 @@ src/data/products.json  products from the current homepage
 src/data/legal.js       legal page texts
 src/lib/catalog.js      data access (swap for Supabase)
 src/lib/cart.jsx        cart state (localStorage)
-src/components/         Header, Footer, HeroSlider, ProductCard, Motion (Lenis/GSAP), VantaNet, Overlays, Icon
+src/components/         Header (nav, mega menu, search), Footer, ProductCard, Rail, Motion (Lenis/GSAP), VantaNet, Overlays, Icon
 src/pages/              Home, Shop, Product, Cart, Info (Repairs/About/Contact/Wholesale/Login), Legal, NotFound
 public/                 logo, Wolt logo, hero images, product images (from easyfixcy.com)
 .claude/skills/         lenis, gsap, vanta, ui-ux-pro-max

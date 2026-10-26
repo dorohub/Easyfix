@@ -51,15 +51,15 @@ export function Reveal({ children, className = '', as: Tag = 'div', deps = [] })
       if (prefersReducedMotion()) return
       const blocks = gsap.utils.toArray('[data-reveal]', ref.current)
       blocks.forEach((el) => {
-        gsap.from(el, { y: 36, autoAlpha: 0, duration: 0.8, ease: 'power3.out', scrollTrigger: { trigger: el, start: 'top 88%', once: true } })
+        gsap.from(el, { y: 24, autoAlpha: 0, duration: 1.1, ease: 'expo.out', scrollTrigger: { trigger: el, start: 'top 88%', once: true } })
       })
       const items = gsap.utils.toArray('[data-reveal-item]', ref.current)
       if (items.length) {
-        gsap.set(items, { y: 32, autoAlpha: 0 })
+        gsap.set(items, { y: 28, autoAlpha: 0 })
         ScrollTrigger.batch(items, {
           start: 'top 92%',
           once: true,
-          onEnter: (els) => gsap.to(els, { y: 0, autoAlpha: 1, duration: 0.65, ease: 'power3.out', stagger: 0.06, overwrite: true }),
+          onEnter: (els) => gsap.to(els, { y: 0, autoAlpha: 1, duration: 1, ease: 'expo.out', stagger: 0.06, overwrite: true }),
         })
       }
     },

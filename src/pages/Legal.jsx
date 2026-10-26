@@ -24,7 +24,7 @@ export default function Legal({ page }) {
         </ul>
       </nav>
       <article className="prose-legal max-w-3xl">
-        <h1 className="text-3xl font-extrabold sm:text-5xl">{t.legal[page]}</h1>
+        <h1 className="display-lg">{t.legal[page]}</h1>
         <p className="mt-5 !text-lg">{doc.intro}</p>
         {doc.sections.map(([heading, blocks]) => (
           <section key={heading}>
