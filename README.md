@@ -12,8 +12,20 @@ npm run build     # production build into dist/
 npm run preview   # serve dist/
 ```
 
+To look at it on your phone in the same Wi-Fi, run `npm run dev -- --host` and open the "Network" address it
+prints.
+
 The site is a single-page app. When hosting it, rewrite all paths to `index.html`
 (`public/_redirects` for Netlify and `vercel.json` for Vercel are included).
+
+### Offline mode on Vercel (current state)
+
+The site is **local only** right now: `vercel.json` overrides the Vercel build with
+`scripts/offline-build.mjs`, so the Vercel URL (easyfix-delta.vercel.app) only shows a small "This page is
+offline" placeholder with `noindex`. Local `npm run dev` / `npm run build` are not affected.
+
+To put it back online, delete the `installCommand` and `buildCommand` lines from `vercel.json`
+(Vercel's Vite preset then runs `npm install` and `npm run build` again) and push.
 
 ### Draft mode
 
